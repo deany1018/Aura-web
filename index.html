@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Aura</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app">
+    <!-- 呼吸之锚页面 -->
+    <main class="main-content page-content active" id="page-breathing">
+      <div class="breathing-container">
+        <h1 class="title">呼吸之锚</h1>
+        
+        <div class="ring-container">
+          <div class="particle-ring" id="breathingRing">
+            <canvas id="dustCanvas" class="dust-canvas"></canvas>
+            <div class="rotating-ring">
+              <canvas id="ringCanvas" class="ring-canvas"></canvas>
+            </div>
+          </div>
+        </div>
+        
+        <p class="phase" id="breathingPhase">准备开始</p>
+      </div>
+      
+      <div class="controls">
+        <div class="sound-section">
+          <span class="sound-label">白噪音</span>
+          <div class="sound-picker">
+            <button class="sound-btn active" data-sound="none">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73 4.27 3zM12 4L9.91 6.09 12 8.18V4z"/></svg>
+            </button>
+            <button class="sound-btn" data-sound="rain">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2c-5.33 4.55-8 8.48-8 11.8 0 4.98 3.8 8.2 8 8.2s8-3.22 8-8.2c0-3.32-2.67-7.25-8-11.8zm0 18c-2.21 0-4-1.79-4-4 0-1.5.8-2.29 1.33-2.83.43-.44.67-.67.67-1.17 0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5H6c0-1.93 1.57-3.5 3.5-3.5 1.36 0 2.55.79 3.12 1.93.21.42.38.88.38 1.37 0 .5-.24.73-.67 1.17-.53.54-1.33 1.33-1.33 2.83 0 2.21 1.79 4 4 4s4-1.79 4-4h-1.5c0 .83-.67 1.5-1.5 1.5s-1.5-.67-1.5-1.5c0-.5.24-.73.67-1.17.53-.54 1.33-1.33 1.33-2.83 0-2.21-1.79-4-4-4z"/></svg>
+            </button>
+            <button class="sound-btn" data-sound="forest">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M14 6l-4.22 5.63 1.25 1.67L14 9.33 19 16h-3l-2.5 4H14v3h-4v-3H8l-2.5-4H2l5-6.67 3.03 4.03 1.25-1.67L10 6H2v12h20V6h-8z"/></svg>
+            </button>
+            <button class="sound-btn" data-sound="waves">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M2 15c1.67 0 2.67.67 4 1.33 1.33-.67 2.33-1.33 4-1.33s2.67.67 4 1.33c1.33-.67 2.33-1.33 4-1.33s2.67.67 4 1.33V9c-1.33-.67-2.67-1.33-4-1.33S15.33 8.33 14 9c-1.33-.67-2.67-1.33-4-1.33S7.33 8.33 6 9 3.33 7.67 2 9v6z"/></svg>
+            </button>
+          </div>
+        </div>
+        
+        <button id="breathingToggle" class="start-btn">开始</button>
+      </div>
+    </main>
+
+    <!-- 感官接地页面 -->
+    <main class="main-content page-content" id="page-grounding">
+      <div class="grounding-container">
+        <h1 class="title grounding-title">感官接地</h1>
+
+        <!-- 练习步骤 -->
+        <div id="groundingSteps" class="grounding-steps">
+          <p class="step-prompt" id="stepPrompt"></p>
+
+          <div class="inputs-container" id="inputsContainer"></div>
+
+          <button class="action-btn" id="nextStepBtn">下一步</button>
+
+          <!-- 进度指示器 -->
+          <div class="progress-dots">
+            <span class="dot active"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+          </div>
+        </div>
+
+        <!-- 完成页面 -->
+        <div id="groundingComplete" class="grounding-complete hidden">
+          <svg class="check-icon" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+          </svg>
+          <h2 class="complete-title">你在这里。你很安全。一切尽在掌控。</h2>
+          <p class="complete-desc">你已经成功完成了感官接地练习。记住这个平静的感觉。</p>
+          <button class="action-btn" id="restartBtn">重新开始</button>
+        </div>
+      </div>
+    </main>
+
+    <!-- 回声树洞页面 -->
+    <main class="main-content page-content" id="page-chat">
+      <div class="chat-container">
+        <h1 class="title chat-title">回声树洞</h1>
+
+        <!-- 粒子背景 -->
+        <div class="chat-particle-bg">
+          <canvas id="chatDustCanvas" class="dust-canvas"></canvas>
+          <div class="rotating-ring">
+            <canvas id="chatRingCanvas" class="ring-canvas"></canvas>
+          </div>
+        </div>
+
+        <!-- 消息列表 -->
+        <div class="messages-container" id="messagesContainer">
+          <!-- 消息动态添加 -->
+        </div>
+
+        <!-- 快速情绪选择器 -->
+        <div class="quick-mood-selector hidden" id="quickMoodSelector">
+          <div class="mood-header">
+            <span class="mood-title">你现在感觉如何？</span>
+            <button class="mood-cancel-btn" id="moodCancelBtn">取消</button>
+          </div>
+          <div class="mood-grid" id="moodGrid">
+            <!-- 情绪按钮动态生成 -->
+          </div>
+        </div>
+
+        <!-- 输入区域 -->
+        <div class="chat-input-area">
+          <div class="input-toolbar">
+            <button class="mood-trigger-btn" id="moodTriggerBtn">
+              <span>😊</span>
+              <span>选择情绪</span>
+            </button>
+            <div class="toolbar-right">
+              <button class="api-settings-btn" id="apiSettingsBtn">API设置</button>
+              <button class="clear-chat-btn hidden" id="clearChatBtn">清空</button>
+            </div>
+          </div>
+
+          <div class="input-row">
+            <textarea class="chat-input" id="chatInput" placeholder="分享你的感受或想法..." rows="1"></textarea>
+            <button class="send-btn" id="sendBtn">
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- API设置对话框 -->
+    <div class="api-settings-modal hidden" id="apiSettingsModal">
+      <div class="api-settings-content">
+        <div class="api-settings-header">
+          <h3>API 设置</h3>
+          <button class="close-btn" id="closeApiSettings">✕</button>
+        </div>
+        <div class="api-settings-body">
+          <p class="api-hint">为保护隐私，API Key 仅保存在你的浏览器中。</p>
+          <div class="api-input-group">
+            <label>API Key</label>
+            <input type="password" id="apiKeyInput" placeholder="sk-...">
+          </div>
+          <div class="api-input-group">
+            <label>Base URL</label>
+            <input type="text" id="apiBaseInput" placeholder="https://api.siliconflow.cn/v1">
+          </div>
+          <div class="api-input-group">
+            <label>模型名称</label>
+            <input type="text" id="apiModelInput" placeholder="deepseek-ai/DeepSeek-R1-0528-Qwen3-8B">
+          </div>
+          <div class="api-status" id="apiStatus"></div>
+        </div>
+        <div class="api-settings-footer">
+          <button class="save-api-btn" id="saveApiBtn">保存</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 底部导航 -->
+    <nav class="tab-bar">
+      <button class="tab active" data-tab="breathing">
+        <svg class="tab-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M18.6 6.62c-1.44 0-2.8.56-3.77 1.53L12 10.66 9.17 8.15C8.2 7.18 6.84 6.62 5.4 6.62 2.42 6.62 0 9.04 0 12s2.42 5.38 5.4 5.38c1.44 0 2.8-.56 3.77-1.53l2.83-2.51 2.83 2.51c.97.97 2.33 1.53 3.77 1.53 2.98 0 5.4-2.38 5.4-5.38s-2.42-5.38-5.4-5.38z"/></svg>
+        <span class="tab-label">呼吸之锚</span>
+      </button>
+      <button class="tab" data-tab="grounding">
+        <svg class="tab-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M17,8C8,10,5.9,16.17,3.82,21.34L5.71,22l1-2.3A4.49,4.49,0,0,0,8,20C19,20,22,3,22,3,21,5,14,5.25,9,6.25S2,11.5,2,13.5a6.22,6.22,0,0,0,1.75,3.75C7,8,17,8,17,8Z"/></svg>
+        <span class="tab-label">感官接地</span>
+      </button>
+      <button class="tab" data-tab="chat">
+        <svg class="tab-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+        <span class="tab-label">回声树洞</span>
+      </button>
+    </nav>
+  </div>
+
+  <audio id="audio-rain" loop src="assets/rain.mp3"></audio>
+  <audio id="audio-forest" loop src="assets/forest.MP3"></audio>
+  <audio id="audio-waves" loop src="assets/waves.wav"></audio>
+
+  <script src="app.js"></script>
+</body>
+</html>
