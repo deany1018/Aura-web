@@ -120,7 +120,6 @@
               <span>选择情绪</span>
             </button>
             <div class="toolbar-right">
-              <button class="api-settings-btn" id="apiSettingsBtn">API设置</button>
               <button class="clear-chat-btn hidden" id="clearChatBtn">清空</button>
             </div>
           </div>
@@ -137,34 +136,7 @@
       </div>
     </main>
 
-    <!-- API设置对话框 -->
-    <div class="api-settings-modal hidden" id="apiSettingsModal">
-      <div class="api-settings-content">
-        <div class="api-settings-header">
-          <h3>API 设置</h3>
-          <button class="close-btn" id="closeApiSettings">✕</button>
-        </div>
-        <div class="api-settings-body">
-          <p class="api-hint">为保护隐私，API Key 仅保存在你的浏览器中。</p>
-          <div class="api-input-group">
-            <label>API Key</label>
-            <input type="password" id="apiKeyInput" placeholder="sk-...">
-          </div>
-          <div class="api-input-group">
-            <label>Base URL</label>
-            <input type="text" id="apiBaseInput" placeholder="https://api.siliconflow.cn/v1">
-          </div>
-          <div class="api-input-group">
-            <label>模型名称</label>
-            <input type="text" id="apiModelInput" placeholder="deepseek-ai/DeepSeek-R1-0528-Qwen3-8B">
-          </div>
-          <div class="api-status" id="apiStatus"></div>
-        </div>
-        <div class="api-settings-footer">
-          <button class="save-api-btn" id="saveApiBtn">保存</button>
-        </div>
-      </div>
-    </div>
+
 
     <!-- 底部导航 -->
     <nav class="tab-bar">

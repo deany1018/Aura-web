@@ -1,25 +1,6 @@
 // ==================== API 配置 ====================
-const DEFAULT_API_CONFIG = {
-  apiKey: 'sk-tyybrrsbdgsrokdkguleqvnjjevmwivwzxykisgzxhnvzvdf',
-  baseURL: 'https://api.siliconflow.cn/v1',
-  modelName: 'deepseek-ai/DeepSeek-R1-0528-Qwen3-8B'
-};
-
-// 从 localStorage 加载 API 配置
-function loadApiConfig() {
-  const saved = localStorage.getItem('aura_api_config');
-  if (saved) {
-    return JSON.parse(saved);
-  }
-  return DEFAULT_API_CONFIG;
-}
-
-// 保存 API 配置到 localStorage
-function saveApiConfig(config) {
-  localStorage.setItem('aura_api_config', JSON.stringify(config));
-}
-
-let apiConfig = loadApiConfig();
+// API 由后端处理，前端不存储 API Key
+const API_ENDPOINT = '/api/chat'; // 后端 API 接口地址
 
 // ==================== 呼吸练习 ====================
 const breathingPhases = [
@@ -323,61 +304,7 @@ const quickMoodSelector = document.getElementById('quickMoodSelector');
 const moodGrid = document.getElementById('moodGrid');
 const clearChatBtn = document.getElementById('clearChatBtn');
 
-// API 设置相关元素
-const apiSettingsBtn = document.getElementById('apiSettingsBtn');
-const apiSettingsModal = document.getElementById('apiSettingsModal');
-const closeApiSettings = document.getElementById('closeApiSettings');
-const saveApiBtn = document.getElementById('saveApiBtn');
-const apiKeyInput = document.getElementById('apiKeyInput');
-const apiBaseInput = document.getElementById('apiBaseInput');
-const apiModelInput = document.getElementById('apiModelInput');
-const apiStatus = document.getElementById('apiStatus');
 
-// 加载已保存的 API 配置到输入框
-function loadApiSettingsToInputs() {
-  apiKeyInput.value = apiConfig.apiKey || '';
-  apiBaseInput.value = apiConfig.baseURL || '';
-  apiModelInput.value = apiConfig.modelName || '';
-}
-
-// 打开 API 设置
-apiSettingsBtn.addEventListener('click', () => {
-  loadApiSettingsToInputs();
-  apiSettingsModal.classList.remove('hidden');
-  apiStatus.textContent = '';
-  apiStatus.className = 'api-status';
-});
-
-// 关闭 API 设置
-closeApiSettings.addEventListener('click', () => {
-  apiSettingsModal.classList.add('hidden');
-});
-
-// 点击模态框背景关闭
-apiSettingsModal.addEventListener('click', (e) => {
-  if (e.target === apiSettingsModal) {
-    apiSettingsModal.classList.add('hidden');
-  }
-});
-
-// 保存 API 设置
-saveApiBtn.addEventListener('click', () => {
-  const newConfig = {
-    apiKey: apiKeyInput.value.trim(),
-    baseURL: apiBaseInput.value.trim() || DEFAULT_API_CONFIG.baseURL,
-    modelName: apiModelInput.value.trim() || DEFAULT_API_CONFIG.modelName
-  };
-  
-  apiConfig = newConfig;
-  saveApiConfig(apiConfig);
-  
-  apiStatus.textContent = '设置已保存';
-  apiStatus.className = 'api-status success';
-  
-  setTimeout(() => {
-    apiSettingsModal.classList.add('hidden');
-  }, 1000);
-});
 
 function renderMoodButtons() {
   moodGrid.innerHTML = '';
@@ -444,49 +371,29 @@ function scrollToBottom() {
   messagesContainer.scrollTop = messagesContainer.scrollHeight;
 }
 
-// 流式调用 API
+// 流式调用后端 API
 async function streamAIResponse(userMessage) {
   const controller = new AbortController();
-  
-  const systemPrompt = `你是一个专业的心理健康助手，专门帮助用户处理情绪问题、压力和心理健康挑战。
-你的特点：温暖、同理心强、不带评判、基于心理学原理（CBT、正念等）提供建议、鼓励用户表达情绪、提供实用的应对策略和放松技巧、在适当时候推荐呼吸练习或正念技巧、使用中文回复，保持自然对话风格。
-重要原则：不提供医疗诊断或药物建议、鼓励寻求专业帮助当需要时、保持积极但现实的观点、尊重用户的感受和经历。
-回复风格：像一位理解你的朋友，提供支持和实用建议。`;
-
-  const requestBody = {
-    model: apiConfig.modelName,
-    messages: [
-      { role: 'system', content: systemPrompt },
-      { role: 'user', content: userMessage }
-    ],
-    temperature: 0.7,
-    max_tokens: 500,
-    stream: true
-  };
 
   try {
-    const response = await fetch(`${apiConfig.baseURL}/chat/completions`, {
+    const response = await fetch(API_ENDPOINT, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${apiConfig.apiKey}`,
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify(requestBody),
+      body: JSON.stringify({ message: userMessage }),
       signal: controller.signal
     });
 
     if (!response.ok) {
-      throw new Error(`API 错误: ${response.status}`);
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.error || `API 错误: ${response.status}`);
     }
 
     const reader = response.body.getReader();
     const decoder = new TextDecoder();
     let fullContent = '';
-
-    // 添加空的 AI 消息
-    const emptyMessage = { content: '', isUser: false, timestamp: new Date() };
-    messages.push(emptyMessage);
-    const messageIndex = messages.length - 1;
+    let aiMessageAdded = false;
 
     while (true) {
       const { done, value } = await reader.read();
@@ -505,14 +412,26 @@ async function streamAIResponse(userMessage) {
             const content = parsed.choices?.[0]?.delta?.content;
             if (content) {
               fullContent += content;
-              messages[messageIndex].content = fullContent;
-              
-              // 更新 DOM
-              const bubbles = messagesContainer.querySelectorAll('.message-bubble.ai');
-              const lastBubble = bubbles[bubbles.length - 1];
-              if (lastBubble) {
-                const contentDiv = lastBubble.querySelector('.bubble-content');
-                if (contentDiv) contentDiv.textContent = fullContent;
+
+              // 第一次收到内容时，隐藏输入指示器并添加 AI 消息
+              if (!aiMessageAdded) {
+                hideTypingIndicator();
+                addMessage(fullContent, false);
+                aiMessageAdded = true;
+              } else {
+                // 更新最后一条 AI 消息
+                const lastMessage = messages[messages.length - 1];
+                if (lastMessage && !lastMessage.isUser) {
+                  lastMessage.content = fullContent;
+
+                  // 更新 DOM
+                  const bubbles = messagesContainer.querySelectorAll('.message-bubble.ai');
+                  const lastBubble = bubbles[bubbles.length - 1];
+                  if (lastBubble) {
+                    const contentDiv = lastBubble.querySelector('.bubble-content');
+                    if (contentDiv) contentDiv.textContent = fullContent;
+                  }
+                }
               }
               scrollToBottom();
             }
@@ -530,35 +449,6 @@ async function streamAIResponse(userMessage) {
   }
 }
 
-// 本地回退响应
-function generateLocalResponse(userMessage) {
-  const lowerMessage = userMessage.toLowerCase();
-
-  if (lowerMessage.includes('焦虑') || lowerMessage.includes('担心') || lowerMessage.includes('紧张')) {
-    return '我理解焦虑的感觉很不舒服。试着深呼吸，我们一起度过这个时刻。你现在的感受是真实的，也是可以被理解的。';
-  } else if (lowerMessage.includes('压力') || lowerMessage.includes('累') || lowerMessage.includes('疲惫')) {
-    return '听起来你承受了很大的压力。在现代生活中，这种感觉很常见。你愿意和我分享一下压力的来源吗？';
-  } else if (lowerMessage.includes('失眠') || lowerMessage.includes('睡不着') || lowerMessage.includes('睡眠')) {
-    return '失眠确实很困扰人。睡眠对我们的身心健康都很重要。你愿意和我聊聊是什么让你难以入睡吗？';
-  } else if (lowerMessage.includes('悲伤') || lowerMessage.includes('难过') || lowerMessage.includes('沮丧')) {
-    return '我感受到你的悲伤。这种情绪虽然痛苦，但它是人类体验的一部分。你愿意和我分享发生了什么吗？';
-  } else if (lowerMessage.includes('愤怒') || lowerMessage.includes('生气') || lowerMessage.includes('烦躁')) {
-    return '愤怒是一种正常的情绪，它告诉我们某些事情需要被关注。你愿意和我分享是什么让你感到愤怒吗？';
-  } else if (lowerMessage.includes('孤独') || lowerMessage.includes('孤单') || lowerMessage.includes('寂寞')) {
-    return '孤独感是人类共同的体验，但这并不意味着你必须独自面对它。我在这里陪伴你，倾听你的感受。';
-  } else if (lowerMessage.includes('你好') || lowerMessage.includes('嗨') || lowerMessage.includes('hello')) {
-    return '你好！很高兴和你聊天。我是专门设计来帮助你处理情绪和压力的智能助手。你今天过得怎么样？';
-  } else if (lowerMessage.includes('谢谢')) {
-    return '不用谢！能帮助你我感到很开心。记住，照顾好自己的心理健康很重要。';
-  } else if (lowerMessage.includes('呼吸') || lowerMessage.includes('放松')) {
-    return '呼吸练习是很好的放松方法！你可以尝试我们的呼吸练习功能，或者我可以在这里引导你进行简单的深呼吸。';
-  } else if (lowerMessage.includes('冥想') || lowerMessage.includes('正念')) {
-    return '正念练习对心理健康非常有益！它帮助我们活在当下，减少对过去和未来的担忧。';
-  } else {
-    return '谢谢你和我分享。我在这里倾听你，支持你的心理健康之旅。你愿意告诉我更多吗？';
-  }
-}
-
 async function sendMessage() {
   const text = chatInput.value.trim();
   if (!text || isTyping) return;
@@ -571,22 +461,26 @@ async function sendMessage() {
   showTypingIndicator();
 
   try {
-    // 尝试调用 API
+    // 调用后端 API
     await streamAIResponse(text);
   } catch (error) {
-    // API 失败，使用本地回退
-    console.log('API 调用失败，使用本地响应:', error);
+    // API 失败，隐藏输入指示器并添加错误消息
+    console.error('API 调用失败:', error);
     hideTypingIndicator();
-    
-    // 移除空的 AI 消息
-    messages.pop();
-    
-    // 添加本地响应
-    const localResponse = generateLocalResponse(text);
-    addMessage(localResponse, false);
+
+    // 添加新的错误消息
+    addMessage('API调用失败，请重新尝试。', false);
+
+    // 将错误消息标红
+    const bubbles = messagesContainer.querySelectorAll('.message-bubble.ai');
+    const lastBubble = bubbles[bubbles.length - 1];
+    if (lastBubble) {
+      const contentDiv = lastBubble.querySelector('.bubble-content');
+      if (contentDiv) contentDiv.style.color = '#e74c3c';
+    }
+    scrollToBottom();
   } finally {
     isTyping = false;
-    hideTypingIndicator();
     updateClearButton();
   }
 }
