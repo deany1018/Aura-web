@@ -6,9 +6,10 @@
 
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  background: linear-gradient(135deg, rgba(0, 150, 200, 0.1) 0%, rgba(0, 180, 180, 0.1) 100%);
+  background: #e8f4f8;
   min-height: 100vh;
   overflow: hidden;
+  transition: background 0.3s ease;
 }
 
 .app {
@@ -17,8 +18,26 @@ body {
   flex-direction: column;
   max-width: 430px;
   margin: 0 auto;
-  background: linear-gradient(180deg, #e8f4f8 0%, #f0f8f8 100%);
+  background: #e8f4f8;
   position: relative;
+}
+
+/* 呼吸之锚页面背景 - 统一青色 */
+#page-breathing {
+  background: #e8f4f8 !important;
+}
+
+/* 感官接地页面背景 - 统一低饱和度绿色 */
+#page-grounding,
+#page-grounding .grounding-container,
+#page-grounding .grounding-steps,
+#page-grounding .grounding-complete {
+  background: #eef5f0 !important;
+}
+
+/* 回声树洞页面背景 - 统一低饱和度紫色 */
+#page-chat {
+  background: #f5f2f7 !important;
 }
 
 /* 主内容区 */
@@ -174,44 +193,51 @@ body {
 /* 底部导航 */
 .tab-bar {
   position: fixed;
-  bottom: 0;
+  bottom: 20px;
   left: 50%;
   transform: translateX(-50%);
-  width: 100%;
-  max-width: 430px;
-  height: 80px;
-  background: rgba(255, 255, 255, 0.95);
+  width: calc(100% - 36px);
+  max-width: 394px;
+  height: 56px;
+  background: rgba(255, 255, 255, 0.9);
   backdrop-filter: blur(10px);
   display: flex;
-  justify-content: space-around;
+  justify-content: center;
   align-items: center;
-  padding-bottom: 20px;
-  border-top: 1px solid rgba(0, 0, 0, 0.05);
+  gap: 6px;
+  border-radius: 28px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  padding: 6px 8px;
 }
 
 .tab {
+  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
+  justify-content: center;
+  gap: 2px;
+  height: 44px;
   background: none;
   border: none;
+  border-radius: 22px;
   cursor: pointer;
-  color: #999;
-  transition: color 0.2s ease;
+  color: var(--tab-color, #999);
+  transition: all 0.2s ease;
 }
 
 .tab.active {
-  color: #2a9d8f;
+  background: var(--tab-active-bg, rgba(42, 157, 143, 0.15));
+  color: var(--tab-active-color, #2a9d8f);
 }
 
 .tab-icon {
-  width: 24px;
-  height: 24px;
+  width: 22px;
+  height: 22px;
 }
 
 .tab-label {
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 500;
 }
 
@@ -240,10 +266,7 @@ body {
 }
 
 .grounding-steps {
-  background: rgba(255, 255, 255, 0.9);
-  border-radius: 20px;
   padding: 30px 20px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
   width: 100%;
   max-width: 350px;
   min-height: 520px;
@@ -322,10 +345,7 @@ body {
 }
 
 .grounding-complete {
-  background: rgba(255, 255, 255, 0.9);
-  border-radius: 20px;
   padding: 40px 30px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
   width: 100%;
   max-width: 350px;
   display: flex;
@@ -563,9 +583,7 @@ body {
   bottom: 0;
   left: 0;
   right: 0;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
-  border-top: 1px solid rgba(0, 0, 0, 0.05);
+  background: transparent;
   z-index: 50;
 }
 

@@ -186,6 +186,8 @@ soundButtons.forEach((btn) => {
 const tabs = document.querySelectorAll('.tab');
 const pages = document.querySelectorAll('.page-content');
 
+const tabBar = document.querySelector('.tab-bar');
+
 tabs.forEach((tab) => {
   tab.addEventListener('click', () => {
     const targetTab = tab.dataset.tab;
@@ -200,10 +202,44 @@ tabs.forEach((tab) => {
       }
     });
 
+    // 根据页面设置不同的背景色和导航栏颜色
+    if (targetTab === 'breathing') {
+      document.body.style.background = '#e8f4f8';
+      tabBar.style.background = 'rgba(255, 255, 255, 0.9)';
+      tabs.forEach(t => {
+        t.style.setProperty('--tab-color', '#999');
+        t.style.setProperty('--tab-active-color', '#2a9d8f');
+        t.style.setProperty('--tab-active-bg', 'rgba(42, 157, 143, 0.15)');
+      });
+    } else if (targetTab === 'grounding') {
+      document.body.style.background = '#eef5f0';
+      tabBar.style.background = 'rgba(255, 255, 255, 0.9)';
+      tabs.forEach(t => {
+        t.style.setProperty('--tab-color', '#999');
+        t.style.setProperty('--tab-active-color', '#4db366');
+        t.style.setProperty('--tab-active-bg', 'rgba(77, 179, 102, 0.15)');
+      });
+    } else if (targetTab === 'chat') {
+      document.body.style.background = '#f5f2f7';
+      tabBar.style.background = 'rgba(255, 255, 255, 0.9)';
+      tabs.forEach(t => {
+        t.style.setProperty('--tab-color', '#999');
+        t.style.setProperty('--tab-active-color', '#9b59b6');
+        t.style.setProperty('--tab-active-bg', 'rgba(155, 89, 182, 0.15)');
+      });
+    }
+
     if (targetTab === 'chat') {
       setTimeout(renderChatRing, 100);
     }
   });
+});
+
+// 初始化呼吸页面颜色
+tabs.forEach(t => {
+  t.style.setProperty('--tab-color', '#999');
+  t.style.setProperty('--tab-active-color', '#2a9d8f');
+  t.style.setProperty('--tab-active-bg', 'rgba(42, 157, 143, 0.15)');
 });
 
 // ==================== 感官接地练习 ====================
