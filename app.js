@@ -551,6 +551,7 @@ function generateChatParticles(size) {
     });
   }
 
+  // 主环粒子 - 600个
   for (let i = 0; i < 600; i++) {
     const angle = Math.random() * Math.PI * 2;
     const radius = baseRadius * 0.9 + Math.random() * baseRadius * 0.2;
@@ -558,11 +559,12 @@ function generateChatParticles(size) {
       x: center + Math.cos(angle) * radius,
       y: center + Math.sin(angle) * radius,
       size: 1 + Math.random() * 2,
-      opacity: 0.2 + Math.random() * 0.5,
+      opacity: 0.25 + Math.random() * 0.55,
       type: 'ring'
     });
   }
 
+  // 内环粒子 - 300个
   for (let i = 0; i < 300; i++) {
     const angle = Math.random() * Math.PI * 2;
     const radius = baseRadius * 0.8 + Math.random() * baseRadius * 0.08;
@@ -570,11 +572,12 @@ function generateChatParticles(size) {
       x: center + Math.cos(angle) * radius,
       y: center + Math.sin(angle) * radius,
       size: 0.5 + Math.random() * 1,
-      opacity: 0.1 + Math.random() * 0.3,
+      opacity: 0.15 + Math.random() * 0.35,
       type: 'ring'
     });
   }
 
+  // 外环粒子 - 300个
   for (let i = 0; i < 300; i++) {
     const angle = Math.random() * Math.PI * 2;
     const radius = baseRadius * 1.12 + Math.random() * baseRadius * 0.08;
@@ -582,7 +585,7 @@ function generateChatParticles(size) {
       x: center + Math.cos(angle) * radius,
       y: center + Math.sin(angle) * radius,
       size: 0.5 + Math.random() * 1,
-      opacity: 0.1 + Math.random() * 0.3,
+      opacity: 0.15 + Math.random() * 0.35,
       type: 'ring'
     });
   }
@@ -623,11 +626,15 @@ function renderChatRing() {
 
   if (!chatParticles) return;
 
-  const teal = '42, 157, 143';
+  // 回声树洞使用紫色+蓝色渐变效果
+  const purple = '155, 89, 182';   // #9b59b6
+  const blue = '52, 152, 219';     // #3498db
 
-  chatParticles.forEach((particle) => {
+  chatParticles.forEach((particle, index) => {
     const ctx = particle.type === 'dust' ? dustCtx : ringCtx;
-    ctx.fillStyle = `rgba(${teal}, ${particle.opacity})`;
+    // 根据粒子位置混合紫色和蓝色
+    const colorMix = index % 2 === 0 ? purple : blue;
+    ctx.fillStyle = `rgba(${colorMix}, ${particle.opacity})`;
     ctx.beginPath();
     ctx.arc(particle.x, particle.y, particle.size / 2, 0, Math.PI * 2);
     ctx.fill();
