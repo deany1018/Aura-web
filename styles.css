@@ -265,6 +265,85 @@ body {
   margin-bottom: 30px;
 }
 
+/* 开始界面 */
+.grounding-start {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 30px;
+  width: 100%;
+  max-width: 350px;
+  min-height: 400px;
+}
+
+.grounding-start.hidden {
+  display: none;
+}
+
+.start-icon {
+  width: 120px;
+  height: 120px;
+  color: #4db366;
+  margin-bottom: 30px;
+}
+
+.start-icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+.grounding-visual {
+  position: relative;
+  width: 280px;
+  height: 280px;
+  margin: 20px auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.grounding-visual .dust-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.grounding-ring-container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 280px;
+  height: 280px;
+  margin-top: -140px;
+  margin-left: -140px;
+  animation: rotateClockwise 20s linear infinite;
+}
+
+.grounding-ring-container .ring-canvas {
+  width: 100%;
+  height: 100%;
+}
+
+@keyframes rotateClockwise {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.start-desc {
+  font-size: 16px;
+  color: #666;
+  text-align: center;
+  line-height: 1.6;
+  margin-bottom: 40px;
+}
+
 .grounding-steps {
   padding: 30px 20px;
   width: 100%;
@@ -394,28 +473,36 @@ body {
   margin-bottom: 10px;
   position: relative;
   z-index: 10;
+  flex-shrink: 0;
 }
 
 .chat-particle-bg {
-  position: absolute;
-  top: 50%;
+  position: fixed;
+  top: calc(50% - 40px);
   left: 50%;
   transform: translate(-50%, -50%);
   width: 350px;
   height: 350px;
   opacity: 0.7;
   z-index: 1;
+  pointer-events: none;
 }
 
 .messages-container {
-  flex: 1;
+  position: fixed;
+  top: 80px;
+  bottom: 160px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 430px;
   overflow-y: auto;
   padding: 20px 15px;
-  padding-bottom: 121px;
   z-index: 5;
   display: flex;
   flex-direction: column;
   gap: 15px;
+  -webkit-overflow-scrolling: touch;
 }
 
 /* 聊天气泡 */
@@ -503,10 +590,12 @@ body {
 
 /* 快速情绪选择器 */
 .quick-mood-selector {
-  position: absolute;
-  bottom: 140px;
-  left: 15px;
-  right: 15px;
+  position: fixed;
+  bottom: 100px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(100% - 30px);
+  max-width: 400px;
   background: white;
   border-radius: 20px;
   padding: 15px;
@@ -582,10 +671,12 @@ body {
 
 /* 输入区域 */
 .chat-input-area {
-  position: absolute;
-  bottom: 1px;
-  left: 0;
-  right: 0;
+  position: fixed;
+  bottom: 90px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 430px;
   background: transparent;
   z-index: 50;
 }

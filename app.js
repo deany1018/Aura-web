@@ -259,8 +259,119 @@ const inputsContainer = document.getElementById('inputsContainer');
 const nextStepBtn = document.getElementById('nextStepBtn');
 const groundingStepsEl = document.getElementById('groundingSteps');
 const groundingComplete = document.getElementById('groundingComplete');
+const groundingStart = document.getElementById('groundingStart');
+const startGroundingBtn = document.getElementById('startGroundingBtn');
 const restartBtn = document.getElementById('restartBtn');
 const progressDots = document.querySelectorAll('.progress-dots .dot');
+
+// 生成感官接地的绿色粒子
+function generateGroundingParticles(size) {
+  const center = size / 2;
+  const baseRadius = size * (90 / 280);
+  const particles = [];
+
+  const pushRingParticles = (count, radiusMin, radiusMax, sizeMin, sizeMax, opacityMin, opacityMax) => {
+    for (let i = 0; i < count; i++) {
+      const angle = Math.random() * Math.PI * 2;
+      const radius = radiusMin + Math.random() * (radiusMax - radiusMin);
+      const x = center + Math.cos(angle) * radius;
+      const y = center + Math.sin(angle) * radius;
+      particles.push({
+        x, y,
+        size: sizeMin + Math.random() * (sizeMax - sizeMin),
+        opacity: opacityMin + Math.random() * (opacityMax - opacityMin),
+        type: 'ring'
+      });
+    }
+  };
+
+  const pushDustParticles = (count, width, height, sizeMin, sizeMax, opacityMin, opacityMax) => {
+    for (let i = 0; i < count; i++) {
+      particles.push({
+        x: Math.random() * width,
+        y: Math.random() * height,
+        size: sizeMin + Math.random() * (sizeMax - sizeMin),
+        opacity: opacityMin + Math.random() * (opacityMax - opacityMin),
+        type: 'dust'
+      });
+    }
+  };
+
+  pushDustParticles(50, size, size, 1, 2, 0.1, 0.5);
+  pushRingParticles(600, baseRadius * 0.9, baseRadius * 1.1, 1, 3, 0.2, 0.7);
+  pushRingParticles(300, baseRadius * 0.8, baseRadius * 0.88, 0.5, 1.5, 0.1, 0.4);
+  pushRingParticles(300, baseRadius * 1.12, baseRadius * 1.2, 0.5, 1.5, 0.1, 0.4);
+
+  return particles;
+}
+
+let groundingParticles = null;
+let groundingParticleSize = 0;
+
+// 绘制感官接地开始界面的绿色粒子圆环
+function renderGroundingRing() {
+  const dustCanvas = document.getElementById('groundingDustCanvas');
+  const ringCanvas = document.getElementById('groundingRingCanvas');
+  if (!dustCanvas || !ringCanvas) return;
+
+  const dustCtx = dustCanvas.getContext('2d');
+  const ringCtx = ringCanvas.getContext('2d');
+  if (!dustCtx || !ringCtx) return;
+
+  const size = 280;
+  if (size !== groundingParticleSize) {
+    groundingParticles = generateGroundingParticles(size);
+    groundingParticleSize = size;
+  }
+
+  const dpr = window.devicePixelRatio || 1;
+
+  dustCanvas.width = Math.floor(size * dpr);
+  dustCanvas.height = Math.floor(size * dpr);
+  dustCanvas.style.width = `${size}px`;
+  dustCanvas.style.height = `${size}px`;
+
+  ringCanvas.width = Math.floor(size * dpr);
+  ringCanvas.height = Math.floor(size * dpr);
+  ringCanvas.style.width = `${size}px`;
+  ringCanvas.style.height = `${size}px`;
+
+  dustCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  dustCtx.clearRect(0, 0, size, size);
+
+  ringCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ringCtx.clearRect(0, 0, size, size);
+
+  const green = '77, 179, 102';
+  if (!groundingParticles) return;
+
+  const dustParticles = groundingParticles.filter(p => p.type === 'dust');
+  const ringParticles = groundingParticles.filter(p => p.type === 'ring');
+
+  dustParticles.forEach((particle) => {
+    dustCtx.fillStyle = `rgba(${green}, ${particle.opacity * 0.5})`;
+    dustCtx.beginPath();
+    dustCtx.arc(particle.x, particle.y, particle.size / 2, 0, Math.PI * 2);
+    dustCtx.fill();
+  });
+
+  ringParticles.forEach((particle) => {
+    ringCtx.fillStyle = `rgba(${green}, ${particle.opacity})`;
+    ringCtx.beginPath();
+    ringCtx.arc(particle.x, particle.y, particle.size / 2, 0, Math.PI * 2);
+    ringCtx.fill();
+  });
+}
+
+// 开始感官接地练习
+startGroundingBtn.addEventListener('click', () => {
+  groundingStart.classList.add('hidden');
+  groundingStepsEl.classList.remove('hidden');
+  renderGroundingStep();
+});
+
+// 初始化绘制绿色粒子圆环
+setTimeout(renderGroundingRing, 100);
 
 function renderGroundingStep() {
   const step = groundingSteps[currentStep];
@@ -299,15 +410,12 @@ function nextStep() {
 function restartGrounding() {
   currentStep = 0;
   userInputs = [];
-  groundingStepsEl.classList.remove('hidden');
   groundingComplete.classList.add('hidden');
-  renderGroundingStep();
+  groundingStart.classList.remove('hidden');
 }
 
 nextStepBtn.addEventListener('click', nextStep);
 restartBtn.addEventListener('click', restartGrounding);
-
-renderGroundingStep();
 
 // ==================== 回声树洞 ====================
 const emotions = [

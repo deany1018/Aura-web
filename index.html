@@ -53,8 +53,20 @@
       <div class="grounding-container">
         <h1 class="title grounding-title">感官接地</h1>
 
+        <!-- 开始界面 -->
+        <div id="groundingStart" class="grounding-start">
+          <div class="breathing-visual grounding-visual">
+            <canvas id="groundingDustCanvas" class="dust-canvas"></canvas>
+            <div class="breathing-ring grounding-ring-container" id="groundingRingContainer">
+              <canvas id="groundingRingCanvas" class="ring-canvas"></canvas>
+            </div>
+          </div>
+          <p class="start-desc">通过关注当下的感官体验，帮助你从焦虑中回到此刻。这是一个简单的五步法练习。</p>
+          <button class="action-btn" id="startGroundingBtn">开始</button>
+        </div>
+
         <!-- 练习步骤 -->
-        <div id="groundingSteps" class="grounding-steps">
+        <div id="groundingSteps" class="grounding-steps hidden">
           <p class="step-prompt" id="stepPrompt"></p>
 
           <div class="inputs-container" id="inputsContainer"></div>
@@ -78,7 +90,7 @@
           </svg>
           <h2 class="complete-title">你在这里。你很安全。一切尽在掌控。</h2>
           <p class="complete-desc">你已经成功完成了感官接地练习。记住这个平静的感觉。</p>
-          <button class="action-btn" id="restartBtn">重新开始</button>
+          <button class="action-btn" id="restartBtn">结束训练</button>
         </div>
       </div>
     </main>
