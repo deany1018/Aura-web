@@ -491,7 +491,7 @@ body {
 .messages-container {
   position: fixed;
   top: 80px;
-  bottom: 160px;
+  bottom: 140px;
   left: 50%;
   transform: translateX(-50%);
   width: 100%;
@@ -672,7 +672,7 @@ body {
 /* 输入区域 */
 .chat-input-area {
   position: fixed;
-  bottom: 90px;
+  bottom: 70px;
   left: 50%;
   transform: translateX(-50%);
   width: 100%;
