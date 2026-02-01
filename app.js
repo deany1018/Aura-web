@@ -152,32 +152,120 @@ breathingToggle.addEventListener('click', () => {
 
 // 白噪音选择
 const soundButtons = document.querySelectorAll('.sound-btn');
+
+// 海浪音频数组 - 按顺序播放
+const wavesAudios = [
+  document.getElementById('audio-waves-v1'),
+  document.getElementById('audio-waves-v2'),
+  document.getElementById('audio-waves-v3'),
+  document.getElementById('audio-waves-v4')
+].filter(a => a !== null);
+
+let currentWavesIndex = 0;
+let isWavesPlaying = false;
+
 const audioMap = {
   none: null,
   rain: document.getElementById('audio-rain'),
   forest: document.getElementById('audio-forest'),
-  waves: document.getElementById('audio-waves')
+  waves: wavesAudios[0] || null
 };
 
 function stopAllSounds() {
+  // 停止普通音频
   Object.values(audioMap).forEach((audio) => {
     if (!audio) return;
     audio.pause();
     audio.currentTime = 0;
   });
+
+  // 停止所有海浪音频
+  wavesAudios.forEach(audio => {
+    audio.pause();
+    audio.currentTime = 0;
+  });
+
+  isWavesPlaying = false;
+  currentWavesIndex = 0;
 }
 
+// 播放下一个海浪音频
+function playNextWaves() {
+  if (!isWavesPlaying) return;
+
+  const nextIndex = (currentWavesIndex + 1) % wavesAudios.length;
+  const currentAudio = wavesAudios[currentWavesIndex];
+  const nextAudio = wavesAudios[nextIndex];
+
+  currentAudio.pause();
+  currentAudio.currentTime = 0;
+
+  currentWavesIndex = nextIndex;
+
+  nextAudio.currentTime = 0;
+  nextAudio.play().catch(err => {
+    console.error('Failed to play next waves:', err);
+    isWavesPlaying = false;
+  });
+}
+
+// 为所有海浪音频添加结束事件监听
+wavesAudios.forEach((audio, index) => {
+  audio.addEventListener('ended', () => {
+    console.log(`Waves V${index + 1} ended, playing next...`);
+    playNextWaves();
+  });
+});
+
+// 当前播放的音频
+let currentSound = 'none';
+
 soundButtons.forEach((btn) => {
-  btn.addEventListener('click', () => {
+  btn.addEventListener('click', async () => {
     const sound = btn.dataset.sound;
-    
+
+    // 如果点击的是当前正在播放的音频，则停止
+    if (sound === currentSound && sound !== 'none') {
+      stopAllSounds();
+      soundButtons.forEach(b => b.classList.remove('active'));
+      soundButtons[0].classList.add('active'); // 选中静音按钮
+      currentSound = 'none';
+      return;
+    }
+
+    // 更新按钮状态
     soundButtons.forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
-    
+
+    // 停止所有音频
     stopAllSounds();
-    
-    if (sound !== 'none' && audioMap[sound]) {
-      audioMap[sound].play().catch(() => {});
+
+    // 播放新音频
+    if (sound === 'waves') {
+      // 海浪音频 - 从第一个开始按顺序播放
+      isWavesPlaying = true;
+      currentWavesIndex = 0;
+
+      try {
+        await wavesAudios[0].play();
+        currentSound = sound;
+        console.log('Playing waves V1');
+      } catch (err) {
+        console.error('Failed to play waves:', err);
+        alert('音频播放失败，请检查音频文件是否存在');
+      }
+    } else if (sound !== 'none' && audioMap[sound]) {
+      try {
+        audioMap[sound].currentTime = 0;
+        await audioMap[sound].play();
+        currentSound = sound;
+        console.log(`Playing ${sound} sound`);
+      } catch (err) {
+        console.error(`Failed to play ${sound}:`, err);
+        alert('音频播放失败，请检查音频文件是否存在');
+      }
+    } else {
+      currentSound = 'none';
     }
   });
 });

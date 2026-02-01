@@ -167,9 +167,25 @@
     </nav>
   </div>
 
-  <audio id="audio-rain" loop src="assets/rain.mp3"></audio>
-  <audio id="audio-forest" loop src="assets/forest.MP3"></audio>
-  <audio id="audio-waves" loop src="assets/waves.wav"></audio>
+  <audio id="audio-rain" loop preload="auto">
+    <source src="assets/rain.mp3" type="audio/mpeg">
+  </audio>
+  <audio id="audio-forest" loop preload="auto">
+    <source src="assets/forest.MP3" type="audio/mpeg">
+  </audio>
+  <!-- 海浪音频 - 4个版本按顺序播放 -->
+  <audio id="audio-waves-v1" preload="auto">
+    <source src="assets/waves_V1.mp3" type="audio/mpeg">
+  </audio>
+  <audio id="audio-waves-v2" preload="auto">
+    <source src="assets/waves_V2.mp3" type="audio/mpeg">
+  </audio>
+  <audio id="audio-waves-v3" preload="auto">
+    <source src="assets/waves_V3.mp3" type="audio/mpeg">
+  </audio>
+  <audio id="audio-waves-v4" preload="auto">
+    <source src="assets/waves_V4.mp3" type="audio/mpeg">
+  </audio>
 
   <script src="app.js"></script>
 </body>
